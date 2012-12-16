@@ -4,6 +4,7 @@ GEM
     domain_name (0.5.6)
       unf (~> 0.0.3)
     json (1.7.5)
+    logem (0.3.0)
     mechanize (2.5.1)
       domain_name (~> 0.5, >= 0.5.1)
       mime-types (~> 1.17, >= 1.17.2)
@@ -27,4 +28,5 @@ PLATFORMS
 
 DEPENDENCIES
   json
+  logem
   mechanize

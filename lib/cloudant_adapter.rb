@@ -32,6 +32,6 @@ class CloudantAdapter
     agent.add_auth @url, @username, @password
     response = agent.post(@url, data.to_json, 'Content-Type' => 'application/json').body
     json = JSON.parse response
-    raise response if json['ok'] 
+    raise response unless json['ok'] 
   end
 end

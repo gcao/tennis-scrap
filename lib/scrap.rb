@@ -1,5 +1,8 @@
+$: << File.dirname(__FILE__)
+
 require 'mechanize'
 require 'json'
+require 'cloudant_adapter'
 
 agent = Mechanize.new
 page = agent.get('http://www.atpworldtour.com/Rankings/Singles.aspx')
@@ -19,9 +22,11 @@ page.search('.rankingsContent tr').each do |row|
   rankings << {rank: rank, first: first[1..-1], last: last.strip, points: points}
 end
 
-result = {time: Time.now, data: rankings[0..49]}
+result = {generated_at: Time.now, data: rankings[0..49]}
 
-File.open('output/rankings.js', 'w') do |f|
-  f.puts result.to_json
-end
+CloudantAdapter.new.save 'rankings', result
+
+#File.open('output/rankings.js', 'w') do |f|
+#  f.puts result.to_json
+#end
 

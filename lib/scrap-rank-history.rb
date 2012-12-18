@@ -1,5 +1,8 @@
+$: << File.dirname(__FILE__)
+
 require 'mechanize'
 require 'json'
+require 'cloudant_adapter'
 
 agent = Mechanize.new
 page = agent.get('http://www.atpworldtour.com/Rankings/Singles.aspx')
@@ -16,9 +19,10 @@ page.search('.rankingsContent tr').each do |row|
   end
 
   rank = row.search('td:first-child span').text.to_i
-  #last, first = row.search('td:first-child a').text.split(',')
-  #first = first[1..-1].strip
-  #last = last.strip
+  last, first = row.search('td:first-child a').text.split(',')
+  first = first[1..-1].strip
+  last = last.strip
+  
   history = []
   url = row.search('td:first-child a').first.attr('href') + '?t=rh'
   history_page = agent.get(url)
@@ -35,10 +39,16 @@ page.search('.rankingsContent tr').each do |row|
     history << ["#{month}/#{day}/#{year}", rank_then]
   end
   
-  #result = {first: first, last: last, rank: rank, history: history}
+  id = "#{first} #{last} rank history"
+  id.downcase!
+  id.gsub!(' ', '_')
+  result = {first: first, last: last, rank: rank, history: history}
 
-  File.open("output/rank-history-#{rank}.js", 'w') do |f|
-    f.puts history.to_json
-  end
+  CloudantAdapter.new.save id, result
+  sleep 2
+
+  #File.open("output/rank-history-#{rank}.js", 'w') do |f|
+  #  f.puts history.to_json
+  #end
 end
 

@@ -1,5 +1,8 @@
+$: << File.dirname(__FILE__)
+
 require 'mechanize'
 require 'json'
+require 'cloudant_adapter'
 
 def detect_tournament_type type_str
   case type_str
@@ -47,9 +50,11 @@ page.search('.calendarTable tr').each do |row|
   end
 end
 
-result = {time: Time.now, data: tournaments}
+result = {generated_at: Time.now, data: tournaments}
 
-File.open('output/tournaments.js', 'w') do |f|
-  f.puts result.to_json
-end
+CloudantAdapter.new.save 'tournaments', result
+
+#File.open('output/tournaments.js', 'w') do |f|
+#  f.puts result.to_json
+#end
 

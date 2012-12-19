@@ -29,6 +29,7 @@ class CloudantAdapter
     end
 
     agent = Mechanize.new
+    agent.log = @logger
     agent.add_auth @url, @username, @password
     response = agent.post(@url, data.to_json, 'Content-Type' => 'application/json').body
     json = JSON.parse response

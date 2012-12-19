@@ -30,7 +30,8 @@ class CloudantAdapter
 
     agent = Mechanize.new
     agent.log = @logger
-    agent.add_auth @url, @username, @password
+    #agent.add_auth @url, @username, @password
+    agent.auth @username, @password
     response = agent.post(@url, data.to_json, 'Content-Type' => 'application/json').body
     json = JSON.parse response
     raise response unless json['ok'] 

@@ -50,11 +50,11 @@ page.search('.calendarTable tr').each do |row|
   end
 end
 
-result = {generated_at: Time.now, data: tournaments}
+result = {_id: 'tournaments', generated_at: Time.now, data: tournaments}
+
+File.open('output/tournaments.js', 'w') do |f|
+  f.puts result.to_json
+end
 
 CloudantAdapter.new.save 'tournaments', result
-
-#File.open('output/tournaments.js', 'w') do |f|
-#  f.puts result.to_json
-#end
 

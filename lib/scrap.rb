@@ -22,11 +22,12 @@ page.search('.rankingsContent tr').each do |row|
   rankings << {rank: rank, first: first[1..-1], last: last.strip, points: points}
 end
 
+id     = 'rankings'
 result = {generated_at: Time.now, data: rankings[0..49]}
 
-CloudantAdapter.new.save 'rankings', result
+CloudantAdapter.new.save id, result
 
-#File.open('output/rankings.js', 'w') do |f|
-#  f.puts result.to_json
-#end
+File.open("../tennis-web/data/#{id}.js", 'w') do |f|
+  f.puts "var #{id} = #{result.to_json};"
+end
 

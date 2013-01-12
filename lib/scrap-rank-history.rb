@@ -34,21 +34,22 @@ page.search('.rankingsContent tr').each do |row|
     end
     day, month, year = row.search('td:first-child').text.split('.')
     break if year.to_i <= 2002
-    rank_then = row.search('td:nth-child(2)').text.to_i
-    rank_then = 50 if rank_then <= 0 or rank_then > 50
-    history << ["#{month}/#{day}/#{year}", rank_then]
+    rank_text = row.search('td:nth-child(2)').text
+    unless rank_text.empty?
+      rank = rank_text.to_i
+      rank = 50 if rank <= 0 or rank > 50
+    end
+    history << ["#{month}/#{day}/#{year}", rank]
   end
   
-  id = "#{first} #{last} rank history"
-  id.downcase!
-  id.gsub!(' ', '_')
+  id     = "#{first}_#{last}_rank_history".downcase
   result = {first: first, last: last, rank: rank, history: history}
 
   CloudantAdapter.new.save id, result
   sleep 2
 
-  #File.open("output/rank-history-#{rank}.js", 'w') do |f|
-  #  f.puts history.to_json
-  #end
+  File.open("../tennis-web/data/#{id}.js", 'w') do |f|
+    f.puts "var #{id} = #{result.to_json};"
+  end
 end
 

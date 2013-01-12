@@ -11,7 +11,7 @@ def detect_tournament_type type_str
   when /1000/        then 'atp1000'
   when /atp final/i  then 'atptourfinal'
   when /grand slam/i then 'grandslam'
-  when /davis/       then 'daviscup'
+  when /davis/i      then 'daviscup'
   else                    type_str
   end
 end
@@ -50,11 +50,12 @@ page.search('.calendarTable tr').each do |row|
   end
 end
 
-result = {_id: 'tournaments', generated_at: Time.now, data: tournaments}
+id     = 'tournaments'
+result = {generated_at: Time.now, data: tournaments}
 
-File.open('output/tournaments.js', 'w') do |f|
-  f.puts result.to_json
+CloudantAdapter.new.save id, result
+
+File.open("../tennis-web/data/#{id}.js", 'w') do |f|
+  f.puts "var #{id} = #{result.to_json};"
 end
-
-CloudantAdapter.new.save 'tournaments', result
 

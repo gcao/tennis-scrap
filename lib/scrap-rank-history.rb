@@ -36,20 +36,22 @@ page.search('.rankingsContent tr').each do |row|
     break if year.to_i <= 2002
     rank_text = row.search('td:nth-child(2)').text
     unless rank_text.empty?
-      rank = rank_text.to_i
-      rank = 50 if rank <= 0 or rank > 50
+      if rank_text.index(',') or rank_text.index('T')
+        rank = 50
+      else
+        rank = rank_text.to_i
+        rank = 50 if rank <= 0 or rank > 50
+      end
     end
     history << ["#{month}/#{day}/#{year}", rank]
   end
   
-  id     = "#{first}_#{last}_rank_history".downcase
+  id     = "#{first}_#{last}_rank_history".downcase.gsub(/[ -]/, '_')
   result = {first: first, last: last, rank: rank, history: history}
 
   CloudantAdapter.new.save id, result
   sleep 2
 
-  File.open("../tennis-web/data/#{id}.js", 'w') do |f|
-    f.puts "var #{id} = #{result.to_json};"
-  end
+  File.write("../tennis/source/data/#{id}.json", result.to_json)
 end
 

@@ -8,7 +8,7 @@ agent = Mechanize.new
 page = agent.get('http://www.atpworldtour.com/Rankings/Singles.aspx')
 
 is_first = true
-i = 11
+i = 51
 page.search('.rankingsContent tr').each do |row|
   break if i <= 0
   i -= 1
@@ -44,6 +44,13 @@ page.search('.rankingsContent tr').each do |row|
       end
     end
     history << ["#{month}/#{day}/#{year}", rank]
+  end
+
+  while history.last[1] >= 50
+    second_to_last = history[history.length - 2]
+    break if second_to_last and second_to_last[1] < 50
+
+    history.pop
   end
   
   id     = "#{first}_#{last}_rank_history".downcase.gsub(/[ -]/, '_')

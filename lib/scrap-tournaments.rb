@@ -24,15 +24,15 @@ tournaments = []
 page.search('.calendarTable tr').each do |row|
   tournament = {}
   tournaments << tournament
-  tournament['name']  = row.search('td:nth-child(3) a').text.strip
-  tournament['url']   = row.search('td:nth-child(3) a').first.attr('href')
+  tournament['name' ] = row.search('td:nth-child(3) a').text.strip
+  tournament['url'  ] = row.search('td:nth-child(3) a').first.attr('href')
   tournament['place'] = place = row.search('td:nth-child(3) :nth-child(3)').text.strip
 
   geo = JSON.parse agent.get('http://maps.googleapis.com/maps/api/geocode/json', address: place, sensor: false).body
   sleep 0.2
   begin
     location = geo['results'].first['geometry']['location']
-    tournament['latitude'] = location['lat']
+    tournament['latitude' ] = location['lat']
     tournament['longitude'] = location['lng']
   rescue => e
     puts e
@@ -55,7 +55,5 @@ result = {generated_at: Time.now, data: tournaments}
 
 CloudantAdapter.new.save id, result
 
-File.open("../tennis-web/data/#{id}.js", 'w') do |f|
-  f.puts "var #{id} = #{result.to_json};"
-end
+File.write("../tennis/source/data/#{id}.json", result.to_json)
 

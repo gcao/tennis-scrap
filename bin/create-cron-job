@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+# Run at 11:30AM
+File.write '/tmp/crontab', <<CRONTAB
+30    11  *   *   *   cd #{`pwd`.strip} && #{`which ruby`.strip} lib/scrap.rb
+32    11  *   *   *   cd #{`pwd`.strip} && #{`which ruby`.strip} lib/scrap-tournaments.rb
+34    11  *   *   *   cd #{`pwd`.strip} && #{`which ruby`.strip} lib/scrap-rank-history.rb
+36    11  *   *   *   cd #{`pwd`.strip} && #{`which ruby`.strip} lib/scrap-win-loss.rb
+CRONTAB
+
+puts 'Check crontab first before loading crontab entries from /tmp/crontab'
+puts '  crontab -l'
+puts '  crontab /tmp/crontab'
+

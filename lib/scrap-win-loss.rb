@@ -104,8 +104,8 @@ players.each do |key, value|
   id     = "#{key}_win_loss"
   result = {name: value[:name], data: data, gs_data: gs_data}
 
-  #CloudantAdapter.new.save id, result
-  #sleep 2
+  CloudantAdapter.new.save id, result
+  sleep 2
 
   File.write("../tennis/source/data/#{id}.json", result.to_json)
 end

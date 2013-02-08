@@ -25,32 +25,31 @@ players = {
   rafael_nadal: {
     name: 'Rafael Nadal',
     url: 'http://en.wikipedia.org/wiki/Rafael_Nadal_career_statistics'
-  }
+  },
+  david_ferrer: {
+    name: 'David Ferrer',
+    url: 'http://en.wikipedia.org/wiki/David_Ferrer_career_statistics'
+  },
+  tomas_berdych: {
+    name: 'Tomáš Berdych',
+    url: 'http://en.wikipedia.org/wiki/Tom%C3%A1%C5%A1_Berdych'
+  },
+  juan_martin_del_potro: {
+    name: 'Juan Martin del Potro',
+    url: 'http://en.wikipedia.org/wiki/Juan_Martin_del_Potro_career_statistics'
+  },
+  jo_wilfried_tsonga: {
+    name: 'Jo-Wilfried Tsonga',
+    url: 'http://en.wikipedia.org/wiki/Jo-Wilfried_Tsonga_career_statistics'
+  },
 }
 
 # PLEASE NOTE: the '–' is a special chars directly copied from the wikipedia page.
 #              It is not the regular '-'.
 col1_pattern = /Overall Win–Loss/
+gs_col1_pattern = /Win–Loss/
 
-players.each do |key, value|
-  page = agent.get(value[:url])
-
-  data = [] # [year, win, lose]
-
-  page.search('.wikitable tr').each do |row|
-    col1 = row.search('th:first-child').text
-    next if col1 !~ col1_pattern
-    
-    row.search('th').each do |col|
-      content = col.text
-      next if content =~ col1_pattern
-      # See note above regarding '-'
-      break if content !~ /(\d+)–(\d+)/
-
-      data << [$1.to_i, $2.to_i]
-    end
-    break
-  end
+def process_data data
   pp data
 
   # Add year
@@ -64,12 +63,49 @@ players.each do |key, value|
   # Remove data prior to 2003
   data.reject! {|row| row[0] < 2003 }
   pp data
+  data
+end
 
-  id     = "#{key}_win_lose"
-  result = {name: value[:name], data: data}
+players.each do |key, value|
+  page = agent.get(value[:url])
 
-  CloudantAdapter.new.save id, result
-  sleep 2
+  gs_data_processed = false
+  gs_data = [] # [year, win, lose]
+  data    = [] # [year, win, lose]
+
+  page.search('.wikitable tr').each do |row|
+    pattern = gs_data_processed ? col1_pattern : gs_col1_pattern
+
+    col1 = row.search('th:first-child').text
+    next if col1 !~ pattern
+    
+    row.search('th').each do |col|
+      content = col.text
+      next if content =~ pattern
+      # See note above regarding '-'
+      break if content !~ /(\d+)–(\d+)/
+
+      (gs_data_processed ? data : gs_data) << [$1.to_i, $2.to_i]
+    end
+
+    break if gs_data_processed # Break from the loop on second pattern match
+
+    gs_data_processed = true
+  end
+
+  pp key
+  # Filter out data included by mistake
+  data.reject! {|d| d[1] > 100 }
+  gs_data.reject! {|d| d[1] > 30 }
+
+  data    = process_data data
+  gs_data = process_data gs_data
+
+  id     = "#{key}_win_loss"
+  result = {name: value[:name], data: data, gs_data: gs_data}
+
+  #CloudantAdapter.new.save id, result
+  #sleep 2
 
   File.write("../tennis/source/data/#{id}.json", result.to_json)
 end

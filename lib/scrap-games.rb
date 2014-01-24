@@ -3,7 +3,7 @@ $: << File.dirname(__FILE__)
 require 'mechanize'
 require 'json'
 require 'ostruct'
-#require 'cloudant_adapter'
+require 'cloudant_adapter'
 
 def translate_tournament_type type
   if type =~ /DC/
@@ -70,7 +70,8 @@ def is_current_year? year
 end
 
 def scrap_player player
-  file_name = "../tennis/source/data/#{player.id}_games.json"
+  id = player.id + "_games"
+  file_name = "../tennis/source/data/#{id}.json"
   result = {}
   if File.exists? file_name
     result = JSON.load File.open(file_name)
@@ -80,15 +81,14 @@ def scrap_player player
   result['name'] = player.name
   result['tournaments'] ||= {}
 
-  years = 1995..Time.now.year
-  years.each do |year|
+  Time.now.year.downto(1995) do |year|
     year = year.to_s
-    #next if result['tournaments'][year] and not is_current_year? year
+    next if result['tournaments'][year] and not is_current_year? year
     result['tournaments'][year] = scrap_year player, year
     result['tournaments'].delete year if result['tournaments'][year].empty?
   end
   File.write(file_name, result.to_json)
-  #CloudantAdapter.new.save id, result
+  CloudantAdapter.new.save id, result
 end
 
 players = [
@@ -96,6 +96,26 @@ players = [
     id:   'roger_federer',
     name: 'Roger Federer',
     url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Roger-Federer.aspx?t=pa&y=YEAR&m=s&e=0'
+  ),
+  OpenStruct.new(
+    id:   'novak_djokovic',
+    name: 'Novak Djokovic',
+    url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Novak-Djokovic.aspx?t=pa&y=YEAR&m=s&e=0'
+  ),
+  OpenStruct.new(
+    id:   'rafael_nadal',
+    name: 'Rafael Nadal',
+    url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Rafael-Nadal.aspx?t=pa&y=YEAR&m=s&e=0'
+  ),
+  OpenStruct.new(
+    id:   'andy_murray',
+    name: 'Andy Murray',
+    url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Andy-Murray.aspx?t=pa&y=YEAR&m=s&e=0'
+  ),
+  OpenStruct.new(
+    id:   'david_ferrer',
+    name: 'David Ferrer',
+    url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/David-Ferrer.aspx?t=pa&y=YEAR&m=s&e=0'
   ),
 ]
 

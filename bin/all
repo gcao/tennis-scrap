@@ -1,0 +1,6 @@
+ruby lib/scrap.rb
+ruby lib/scrap-games.rb
+ruby lib/scrap-rank-history.rb
+ruby lib/scrap-ytd.rb
+ruby lib/scrap-tournaments.rb
+ruby lib/scrap-win-loss.rb

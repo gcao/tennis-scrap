@@ -81,7 +81,8 @@ def scrap_player player
   result['name'] = player.name
   result['tournaments'] ||= {}
 
-  Time.now.year.downto(1995) do |year|
+  current_year = Time.now.year
+  current_year.downto(1995) do |year|
     year = year.to_s
     next if result['tournaments'][year] and not is_current_year? year
     result['tournaments'][year] = scrap_year player, year
@@ -89,6 +90,12 @@ def scrap_player player
   end
   File.write(file_name, result.to_json)
   CloudantAdapter.new.save id, result
+
+  # Games of current year
+  current_games = result['tournaments'][current_year.to_s]
+  current_games_id = "#{id}_#{current_year}"
+  File.write "../tennis/source/data/#{current_games_id}.json", current_games.to_json
+  CloudantAdapter.new.save current_games_id, {data: current_games}
 end
 
 players = [

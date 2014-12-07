@@ -20,13 +20,19 @@ end
 agent = Mechanize.new
 page = agent.get('http://www.atpworldtour.com/Tournaments/Event-Calendar.aspx')
 
+ROW_CSS   = '.calendarTable tr'
+COL_CSS   = "td:nth-child(3)"
+NAME_CSS  = "#{COL_CSS} a"
+PLACE_CSS = "#{COL_CSS} :nth-child(3)"
+TIME_CSS  = "td:nth-child(2)"
+
 tournaments = []
-page.search('.calendarTable tr').each do |row|
+page.search(ROW_CSS).each do |row|
   tournament = {}
   tournaments << tournament
-  tournament['name' ] = row.search('td:nth-child(3) a').text.strip
-  tournament['url'  ] = row.search('td:nth-child(3) a').first.attr('href')
-  tournament['place'] = place = row.search('td:nth-child(3) :nth-child(3)').text.strip
+  tournament['name' ]         = row.search(NAME_CSS).text.strip
+  tournament['url'  ]         = row.search(NAME_CSS).first.attr('href')
+  tournament['place'] = place = row.search(PLACE_CSS).text.strip
 
   geo = JSON.parse agent.get('http://maps.googleapis.com/maps/api/geocode/json', address: place, sensor: false).body
   sleep 0.2
@@ -38,7 +44,7 @@ page.search('.calendarTable tr').each do |row|
     puts e
   end
 
-  day, month, year = row.search('td:nth-child(2)').text.split('.')
+  day, month, year = row.search(TIME_CSS).text.split('.')
   tournament['start'] = Date.new(year.to_i, month.to_i, day.to_i)
 
   if logo = row.search('td:nth-child(1) img').first
@@ -48,12 +54,14 @@ page.search('.calendarTable tr').each do |row|
   if title_holder = row.search('td.lastCell a:first-child').first
     tournament['title_holder'] = {name: title_holder.text.strip, url: title_holder.attr('href')}
   end
+
+  puts tournament
 end
 
 id     = 'tournaments'
 result = {generated_at: Time.now, data: tournaments}
 
-CloudantAdapter.new.save id, result
+#CloudantAdapter.new.save id, result
 
 File.write("../tennis/source/data/#{id}.json", result.to_json)
 

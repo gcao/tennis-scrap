@@ -2,7 +2,7 @@ $: << File.dirname(__FILE__)
 
 require 'cloudant_adapter'
 
-CloudantAdapter.new.save 'ticket_urls', data: [
+CloudantAdapter.new.save 'ticket-urls', data: [
   {
       name: "US Open",
       url:  "http://www.ticketcity.com/tennis-tickets/us-open-tennis-tickets.html"

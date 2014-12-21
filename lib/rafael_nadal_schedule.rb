@@ -6,9 +6,6 @@ require 'cloudant_adapter'
 id   = File.basename(__FILE__).sub(/\.rb$/, '')
 data = [
   {
-    tournament: "Brisbane International presented by Suncorp",
-  },
-  {
     tournament: "Australian Open",
   },
   {

@@ -4,59 +4,62 @@ require 'json'
 require 'cloudant_adapter'
 
 id   = File.basename(__FILE__).sub(/\.rb$/, '')
-data = [
-  {
-    tournament: "Brisbane International presented by Suncorp",
-  },
-  {
-    tournament: "Australian Open",
-  },
-  {
-    tournament: "BNP Paribas Open",
-  },
-  {
-    tournament: "Miami Open, presented by Itau",
-  },
-  {
-    tournament: "Monte-Carlo Rolex Masters",
-  },
-  {
-    tournament: "Mutua Madrid Open",
-  },
-  {
-    tournament: "Internazionali BNL d'Italia",
-  },
-  {
-    tournament: "Roland Garros",
-  },
-  {
-    tournament: "Wimbledon",
-  },
-  {
-    tournament: "Rogers Cup",
-  },
-  {
-    tournament: "Western & Southern Open - Cincinnati",
-  },
-  {
-    tournament: "US Open",
-  },
-  {
-    tournament: "Shanghai Rolex Masters",
-  },
-  {
-    tournament: "Swiss Indoors Basel",
-  },
-  {
-    tournament: "BNP Paribas Masters",
-  },
-  {
-    tournament: "Barclays ATP World Tour Finals",
-  },
-    #result:     "",
-    #defeated:   "",
-    #lost_to:    "",
-]
+data = {
+  generated_at: Time.now.to_i,
+  data: [
+    {
+      tournament: "Brisbane International presented by Suncorp",
+    },
+    {
+      tournament: "Australian Open",
+    },
+    {
+      tournament: "BNP Paribas Open",
+    },
+    {
+      tournament: "Miami Open, presented by Itau",
+    },
+    {
+      tournament: "Monte-Carlo Rolex Masters",
+    },
+    {
+      tournament: "Mutua Madrid Open",
+    },
+    {
+      tournament: "Internazionali BNL d'Italia",
+    },
+    {
+      tournament: "Roland Garros",
+    },
+    {
+      tournament: "Wimbledon",
+    },
+    {
+      tournament: "Rogers Cup",
+    },
+    {
+      tournament: "Western & Southern Open - Cincinnati",
+    },
+    {
+      tournament: "US Open",
+    },
+    {
+      tournament: "Shanghai Rolex Masters",
+    },
+    {
+      tournament: "Swiss Indoors Basel",
+    },
+    {
+      tournament: "BNP Paribas Masters",
+    },
+    {
+      tournament: "Barclays ATP World Tour Finals",
+    },
+      #result:     "",
+      #defeated:   "",
+      #lost_to:    "",
+  ]
+}
 
 CloudantAdapter.new.save id, data
 

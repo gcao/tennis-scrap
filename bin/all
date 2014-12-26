@@ -4,3 +4,7 @@ ruby lib/scrap-rank-history.rb
 ruby lib/scrap-ytd.rb
 ruby lib/scrap-tournaments.rb
 ruby lib/scrap-win-loss.rb
+ruby lib/roger_federer_schedule.rb
+ruby lib/rafael_nadal_schedule.rb
+ruby lib/novak_djokovic_schedule.rb
+ruby lib/andy_murray_schedule.rb

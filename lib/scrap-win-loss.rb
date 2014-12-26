@@ -44,10 +44,9 @@ players = {
   },
 }
 
-# PLEASE NOTE: the '–' is a special chars directly copied from the wikipedia page.
-#              It is not the regular '-'.
-col1_pattern = /Overall Win–Loss/
-gs_col1_pattern = /Win–Loss/
+dash            = "[-–]" # There are two different dashes found on the page
+col1_pattern    = /Overall Win#{dash}Loss/
+gs_col1_pattern = /Win#{dash}Loss/
 
 def process_data data
   pp data
@@ -83,7 +82,7 @@ players.each do |key, value|
       content = col.text
       next if content =~ pattern
       # See note above regarding '-'
-      break if content !~ /(\d+)–(\d+)/
+      break if content !~ /(\d+)#{dash}(\d+)/
 
       (gs_data_processed ? data : gs_data) << [$1.to_i, $2.to_i]
     end

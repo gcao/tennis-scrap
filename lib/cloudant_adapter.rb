@@ -23,6 +23,9 @@ class CloudantAdapter
   end
 
   def save id, data
+    # NOTE: Cloudant was bought by IBM. This is not working any more.
+    return
+
     data['_id'] = id
     if found = read(id)
       data['_rev'] = found['_rev']

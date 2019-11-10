@@ -38,7 +38,7 @@ PLATFORMS
 DEPENDENCIES
   json (= 2.2.0)
   logem
-  mechanize
+  mechanize (= 2.7.6)
 
 BUNDLED WITH
    1.17.3

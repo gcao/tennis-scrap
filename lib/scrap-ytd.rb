@@ -6,21 +6,24 @@ require 'json'
 require 'cloudant_adapter'
 
 agent = Mechanize.new
-page = agent.get('http://www.atpworldtour.com/Rankings/YTD-Singles.aspx')
+page = agent.get('https://www.atptour.com/en/rankings/singles-race-to-london')
 
 rankings = []
 is_first = true
-page.search('.rankingsContent tr').each do |row|
+page.search('.table-rankings tr').each do |row|
   if is_first
     is_first = false
     next
   end
 
-  rank = row.search('td:first-child span').text.to_i
-  last, first = row.search('td:first-child a').text.split(',')
+  rank = row.search('td:first-child').text.to_i
+  name = row.search('td:nth-child(4) a').text
+  i = name.rindex ' '
+  first = name[0..i-1]
+  last = name[i+1..-1]
   #name = "#{first.strip} #{last.strip}"
-  points = row.search('td:nth-child(2)').text.sub(',', '').to_i
-  rankings << {rank: rank, first: first[1..-1], last: last.strip, points: points}
+  points = row.search('td:nth-child(6)').text.sub(',', '').to_i
+  rankings << {rank: rank, first: first, last: last.strip, points: points}
 end
 
 id     = 'rankings_ytd'

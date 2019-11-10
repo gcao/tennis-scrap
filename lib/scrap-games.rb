@@ -60,14 +60,14 @@ def translate_score_to_set set_score
     end
   end
 
-  set[:is_winner] = won_games > lost_games
-  set[:won_games] = won_games
-  set[:lost_games] = lost_games
+  set[:is_winner] = won_games.to_i > lost_games.to_i
+  set[:won_games] = won_games.to_i
+  set[:lost_games] = lost_games.to_i
 
   set
 end
 
-# TODO: update game info based on score
+# Update game info based on score
 #   format: best-of-three / best-of-five / other
 #   not_finished: true/false - whether myself or the opponent retire during the game
 #   is_walk_over: true/false
@@ -92,8 +92,7 @@ end
 # 63 64
 # 46 764 60
 # 63 75
-#
-# 61 64 64
+# 61 64 40 (RET)
 # 63 64 64
 # 671 46 63 36
 # (W/O)
@@ -168,6 +167,9 @@ def scrap_year player, year
 
     tournament_dates = row.search('.tourney-dates').text.strip.split('-')
     date = Date.parse tournament_dates[0]
+    if tournament_dates.length > 1
+      end_date = Date.parse tournament_dates[1]
+    end
     location = row.search('.tourney-location').text.strip
 
     is_indoor = false
@@ -178,8 +180,13 @@ def scrap_year player, year
     end
     court_type = court_type_parts.last
 
-    type_img = row.search('.tourney-badge-wrapper img').attr('src').value.strip
-    type = translate_tournament_type type_img, tournament_name
+    img = row.search('.tourney-badge-wrapper img')
+    if img.empty?
+      type = 'other'
+    else
+      type_img = img.attr('src').value.strip
+      type = translate_tournament_type type_img, tournament_name
+    end
 
     games = row.search('.mega-table tr').map do |tr|
       round = tr.search('td:first-child').text.strip
@@ -207,7 +214,7 @@ def scrap_year player, year
       format = 'best-of-three'
     end
 
-    tournaments << {
+    tournament = {
       name: tournament_name,
       date: date,
       location: location,
@@ -217,6 +224,10 @@ def scrap_year player, year
       is_indoor: is_indoor,
       games: games
     }
+    if end_date
+      tournament[:end_date] = end_date
+    end
+    tournaments << tournament
   end
 
   tournaments
@@ -239,7 +250,7 @@ def scrap_player player, start_year
   result['tournaments'] ||= {}
 
   current_year = Time.now.year
-  current_year.downto(start_year) do |year|
+  start_year.upto(current_year) do |year|
     year = year.to_s
     next if result['tournaments'][year] and not is_current_year? year
     result['tournaments'][year] = scrap_year player, year
@@ -259,27 +270,39 @@ players = [
   OpenStruct.new(
     id:   'roger_federer',
     name: 'Roger Federer',
-    url:  'https://www.atptour.com/en/players/roger-federer/f324/player-activity?year=YEAR'
+    start_year: 1998,
+    url:  'https://www.atptour.com/en/players/roger-federer/f324/player-activity?year=YEAR',
   ),
   OpenStruct.new(
     id:   'novak_djokovic',
     name: 'Novak Djokovic',
-    url:  'https://www.atptour.com/en/players/novak-djokovic/d643/player-activity'
+    start_year: 2003,
+    url:  'https://www.atptour.com/en/players/novak-djokovic/d643/player-activity?year=YEAR',
+  ),
+  OpenStruct.new(
+    id:   'rafael_nadal',
+    name: 'Rafael Nadal',
+    start_year: 2001,
+    url:  'https://www.atptour.com/en/players/rafael-nadal/n409/player-activity?year=YEAR',
+  ),
+  OpenStruct.new(
+    id:   'andy_murray',
+    name: 'Andy Murray',
+    start_year: 2005,
+    url:  'https://www.atptour.com/en/players/andy-murray/mc10/player-activity?year=YEAR',
+  ),
+  OpenStruct.new(
+    id:   'david_ferrer',
+    name: 'David Ferrer',
+    start_year: 2000,
+    end_year: 2019,
+    url:  'https://www.atptour.com/en/players/david-ferrer/f401/player-activity?year=YEAR',
   ),
   # OpenStruct.new(
-  #   id:   'rafael_nadal',
-  #   name: 'Rafael Nadal',
-  #   url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Rafael-Nadal.aspx?t=pa&y=YEAR&m=s&e=0'
-  # ),
-  # OpenStruct.new(
-  #   id:   'andy_murray',
-  #   name: 'Andy Murray',
-  #   url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/Andy-Murray.aspx?t=pa&y=YEAR&m=s&e=0'
-  # ),
-  # OpenStruct.new(
-  #   id:   'david_ferrer',
-  #   name: 'David Ferrer',
-  #   url:  'http://www.atpworldtour.com/Tennis/Players/Top-Players/David-Ferrer.aspx?t=pa&y=YEAR&m=s&e=0'
+  #   id:   'daniil_medvedev',
+  #   name: 'Daniil Medvedev',
+  #   start_year: 2014,
+  #   url:  'https://www.atptour.com/en/players/daniil-medvedev/mm58/player-activity?year=YEAR',
   # ),
 ]
 
@@ -290,5 +313,9 @@ if ARGV.length > 0
 end
 
 players.each do |player|
-  scrap_player player, start_year
+  if player[:start_year] && player[:start_year] > start_year
+    scrap_player player, player[:start_year]
+  else
+    scrap_player player, start_year
+  end
 end

@@ -1,0 +1,23 @@
+players:
+  - first: Roger
+    last: Federer
+    id: roger_federer
+  - first: Rafael
+    last: Nadal
+    id: rafael_nadal
+  - first: Novak
+    last: Djokovic
+    id: novak_djokovic
+  - first: Andy
+    last: Murray
+    id: andy_murray
+    atptour_id: mc10
+  - first: Stanislas
+    last: Wawrinka
+    id: stanislas_wawrinka
+  - first: Juan Martin Del
+    last: Potro
+    id: juan_margin_del_potro
+  - first: David
+    last: Ferrer
+    id: david_ferrer

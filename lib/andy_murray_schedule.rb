@@ -5,6 +5,7 @@ require 'cloudant_adapter'
 
 id   = File.basename(__FILE__).sub(/\.rb$/, '')
 data = {
+  name: "Andy Murray",
   generated_at: Time.now.to_i,
   data: [
     {

@@ -222,7 +222,7 @@ def scrap_year player, year
       format: format,
       court_type: court_type,
       is_indoor: is_indoor,
-      games: games
+      games: games.reverse,
     }
     if end_date
       tournament[:end_date] = end_date

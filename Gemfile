@@ -4,6 +4,6 @@ group :development do
 end
 
 gem 'mechanize', '2.7.6'
-gem 'json', '2.2.0'
+gem 'json', '2.3.0'
 gem 'logem'
 

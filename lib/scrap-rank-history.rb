@@ -42,10 +42,6 @@ end
 
 players = []
 
-if ARGV.length >= 1
-else
-end
-
 agent = Mechanize.new
 page = agent.get('http://www.atpworldtour.com/Rankings/Singles.aspx')
 
